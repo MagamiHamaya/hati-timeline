@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>真神ハティのポスト一覧</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #15202b;
+      color: #ffffff;
+      padding: 20px;
+    }
+    .post {
+      background: #192734;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border: 1px solid #253341;
+    }
+    .username {
+      font-weight: bold;
+      color: #1DA1F2;
+    }
+    .content {
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+    .timestamp {
+      font-size: 0.8em;
+      color: #8899a6;
+      margin-top: 8px;
+    }
+    .post img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🕊️ 真神ハティのポスト</h1>
+  <div id="timeline"></div>
+
+  <script>
+    fetch("https://api.rss2json.com/v1/api.json?rss_url=https://nitter.poast.org/hati_magami/rss")
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById("timeline");
+        data.items.forEach(item => {
+          const post = document.createElement("div");
+          post.className = "post";
+
+          // ユーザー名
+          const username = document.createElement("div");
+          username.className = "username";
+          username.textContent = item.author;
+
+          // ポスト内容（改行あり）
+          const content = document.createElement("div");
+          content.className = "content";
+          content.innerHTML = `<a href="${item.link}" target="_blank" style="color: inherit; text-decoration: none;">${item.title.replace(/\n/g, "<br>")}</a>`;
+
+          // 投稿日時
+          const timestamp = document.createElement("div");
+          timestamp.className = "timestamp";
+          const date = new Date(item.pubDate);
+          timestamp.textContent = date.toLocaleString();
+
+          post.appendChild(username);
+          post.appendChild(content);
+          post.appendChild(timestamp);
+
+          // 画像（ある場合のみ）
+          const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
+          if (imgMatch) {
+            const img = document.createElement("img");
+            img.src = imgMatch[1];
+            post.appendChild(img);
+          }
+
+          container.appendChild(post);
+        });
+      });
+  </script>
+</body>
+</html>

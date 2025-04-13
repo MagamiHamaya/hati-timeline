@@ -1,0 +1,49 @@
+/* styles.css */
+
+/* 全体のスタイル */
+body {
+    background-color: #f5f8fa; /* Twitter風の背景色 */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #14171a; /* テキスト色 */
+    margin: 0;
+    padding: 0;
+}
+
+/* コンテナを中央に配置 */
+.container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ツイートカード */
+.tweet {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    padding: 15px;
+    display: flex;
+    align-items: flex-start;
+}
+
+/* ユーザーアイコン */
+.tweet .avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+/* ツイート内容 */
+.tweet .content {
+    max-width: 500px;
+}
+
+/* ツイートのメタ情報 */
+.tweet .meta {
+    font-size: 12px;
+    color: #657786;
+    margin-top: 10px;
+}

@@ -44,7 +44,7 @@
 
   <script>
     function loadPosts() {
-      fetch("https://api.rss2json.com/v1/api.json?rss_url=https://nitter.poast.org/hati_magami/rss")
+      fetch("https://api.rss2json.com/v1/api.json?rss_url=https://nitter.privacydev.net/hati_magami/rss")
         .then(response => response.json())
         .then(data => {
           const container = document.getElementById("timeline");

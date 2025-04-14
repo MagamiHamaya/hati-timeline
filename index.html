@@ -1,87 +1,103 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>真神ハティのポスト一覧</title>
-    <style>
-      body {
-        font-family: sans-serif;
-        background: #15202b;
-        color: #ffffff;
-        padding: 20px;
-      }
-      .post {
-        background: #192734;
-        border-radius: 15px;
-        padding: 15px;
-        margin-bottom: 15px;
-        border: 1px solid #253341;
-      }
-      .username {
-        font-weight: bold;
-        color: #1DA1F2;
-      }
-      .content {
-        margin-top: 5px;
-        line-height: 1.5;
-      }
-      .timestamp {
-        font-size: 0.8em;
-        color: #8899a6;
-        margin-top: 8px;
-      }
-      .post img {
-        max-width: 100%;
-        border-radius: 10px;
-        margin-top: 10px;
-      }
-    </style>
+  <meta charset="UTF-8">
+  <title>真神ハティのポスト一覧</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #15202b;
+      color: #ffffff;
+      padding: 20px;
+    }
+    .post {
+      background: #192734;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border: 1px solid #253341;
+    }
+    .username {
+      font-weight: bold;
+      color: #1DA1F2;
+    }
+    .content {
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+    .timestamp {
+      font-size: 0.8em;
+      color: #8899a6;
+      margin-top: 8px;
+    }
+    .post img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
   <h1>🕊️ 真神ハティのポスト</h1>
-  <div id="timeline"></div>
+  <div id="timeline">読み込み中...</div>
 
   <script>
-    fetch("https://api.rss2json.com/v1/api.json?rss_url=https://nitter.poast.org/hati_magami/rss")
-      .then(response => response.json())
-      .then(data => {
-        const container = document.getElementById("timeline");
-        data.items.forEach(item => {
-          const post = document.createElement("div");
-          post.className = "post";
+    function loadPosts() {
+      fetch("https://api.rss2json.com/v1/api.json?rss_url=https://nitter.poast.org/hati_magami/rss")
+        .then(response => response.json())
+        .then(data => {
+          const container = document.getElementById("timeline");
+          container.innerHTML = ""; // クリアしてから再描画
 
-          // ユーザー名
-          const username = document.createElement("div");
-          username.className = "username";
-          username.textContent = item.author;
+          data.items.forEach(item => {
+            const post = document.createElement("div");
+            post.className = "post";
 
-          // ポスト内容（改行あり）
-          const content = document.createElement("div");
-          content.className = "content";
-          content.innerHTML = `<a href="${item.link}" target="_blank" style="color: inherit; text-decoration: none;">${item.title.replace(/\n/g, "<br>")}</a>`;
+            // ユーザー名
+            const username = document.createElement("div");
+            username.className = "username";
+            username.textContent = item.author;
 
-          // 投稿日時
-          const timestamp = document.createElement("div");
-          timestamp.className = "timestamp";
-          const date = new Date(item.pubDate);
-          timestamp.textContent = date.toLocaleString();
+            // ポスト内容
+            const content = document.createElement("div");
+            content.className = "content";
+            content.innerHTML = `<a href="${item.link}" target="_blank" style="color: inherit; text-decoration: none;">${item.title.replace(/\n/g, "<br>")}</a>`;
 
-          post.appendChild(username);
-          post.appendChild(content);
-          post.appendChild(timestamp);
+            // 投稿日時
+            const timestamp = document.createElement("div");
+            timestamp.className = "timestamp";
+            const date = new Date(item.pubDate);
+            timestamp.textContent = date.toLocaleString();
 
-          // 画像（ある場合のみ）
-          const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
-          if (imgMatch) {
-            const img = document.createElement("img");
-            img.src = imgMatch[1];
-            post.appendChild(img);
-          }
+            post.appendChild(username);
+            post.appendChild(content);
+            post.appendChild(timestamp);
 
-          container.appendChild(post);
+            // 画像がある場合だけ表示
+            const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
+            if (imgMatch && imgMatch[1].startsWith("http")) {
+              const img = document.createElement("img");
+              img.src = imgMatch[1];
+              img.onerror = () => img.remove(); // 表示できない画像は削除
+              post.appendChild(img);
+            }
+
+            container.appendChild(post);
+          });
+        })
+        .catch(err => {
+          const container = document.getElementById("timeline");
+          container.innerHTML = "投稿の読み込みに失敗しました。";
+          console.error("読み込みエラー:", err);
         });
-      });
+    }
+
+    // 最初に読み込む
+    loadPosts();
+
+    // 5分ごとに自動更新（300000ms = 5分）
+    setInterval(loadPosts, 300000);
   </script>
 </body>
 </html>
